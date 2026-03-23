@@ -8,8 +8,7 @@ Este proyecto implementa una solución integral de automatización para un empre
 ## 📊 Arquitectura del Sistema
 El núcleo del proyecto es un orquestador de eventos desarrollado en **n8n** que conecta la captura de datos con la lógica de negocio y la comunicación con el cliente.
 
-![Flujo de Automatización de Las Dellas](<img width="1366" height="605" alt="workflow_screenshot" src="https://github.com/user-attachments/assets/9f859c39-4c5c-459a-be1f-e380ac7a8773" />
-) 
+![Flujo de Automatización de Las Dellas]<img width="1366" height="605" alt="workflow_screenshot" src="https://github.com/user-attachments/assets/515856c0-e1ec-4486-bc08-25e1a52aef46" />
 
 ## 🛠️ Stack Tecnológico
 * **Frontend:** Google Sites (Landing Page).
