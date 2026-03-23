@@ -1,0 +1,320 @@
+{
+  "name": "Las Dellas",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// 1. Capturamos los datos del nodo anterior (Google Sheets)\nconst pedido = $input.first().json; \n\n// 2. Extraemos las cantidades usando los nombres exactos de tu nueva hoja\nconst cantRev = parseInt(pedido[\"Modelos [Origen - Reversible 35.000 c/u]\"]) || 0;\nconst cantChino = parseInt(pedido[\"Modelos [Origen - Chino 30.000 c/u]\"]) || 0;\nconst cantToalla = parseInt(pedido[\"Modelos [Origen - Toalla 40.000 c/u]\"]) || 0;\n\n// 3. Tomamos el Total que calcula tu ARRAYFORMULA del Sheet\nconst totalCalculado = pedido[\"Total\"] || 0;\n\n// 4. URLs de imágenes (Asegurate de que sean links directos)\nconst imgToalla = 'https://lh3.googleusercontent.com/d/1TDvogkDQrcy5LYeF9MNba1005YF8ENeO';\nconst imgRev_Cara1 = 'https://lh3.googleusercontent.com/d/1XMoc3ON6-lxVgoKBw2H20G1DTYwUL5lR';\nconst imgRev_Cara2 = 'https://lh3.googleusercontent.com/d/1kmnD6UEjnUYBa-_v9HI1PcngNPK5PFF0';\nconst imgChino = 'https://lh3.googleusercontent.com/d/12o_6uPc02xfsPhs3oTGEsFAAHmT5s_b_';\n\n// 5. Armamos el listado de productos dinámico\nlet htmlProductos = '';\n\nif (cantToalla > 0) {\n  htmlProductos += `\n    <div style=\"border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; border-radius: 8px;\">\n      <img src=\"${imgToalla}\" style=\"width: 70px; height: 70px; margin-right: 15px; border-radius: 5px; object-fit: cover;\">\n      <div>\n        <p style=\"margin: 0; font-weight: bold;\">Delantal de Toalla</p>\n        <p style=\"margin: 5px 0 0 0; color: #555;\">Cantidad: ${cantToalla}</p>\n      </div>\n    </div>`;\n}\n\nif (cantRev > 0) {\n  htmlProductos += `\n    <div style=\"border: 1px solid #d1a98c; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; border-radius: 8px; background-color: #fffaf5;\">\n      <div style=\"display: flex; gap: 4px;\">\n        <img src=\"${imgRev_Cara1}\" style=\"width: 50px; height: 50px; border-radius: 4px; object-fit: cover;\">\n        <img src=\"${imgRev_Cara2}\" style=\"width: 50px; height: 50px; border-radius: 4px; object-fit: cover;\">\n      </div>\n      <div style=\"margin-left: 15px;\">\n        <p style=\"margin: 0; font-weight: bold; color: #8d6e63;\">Delantal Reversible (2 en 1)</p>\n        <p style=\"margin: 2px 0 0 0; color: #555; font-size: 13px;\">Cantidad: ${cantRev}</p>\n      </div>\n    </div>`;\n}\n\nif (cantChino > 0) {\n  htmlProductos += `\n    <div style=\"border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; border-radius: 8px;\">\n      <img src=\"${imgChino}\" style=\"width: 70px; height: 70px; margin-right: 15px; border-radius: 5px; object-fit: cover;\">\n      <div>\n        <p style=\"margin: 0; font-weight: bold;\">Delantal Chino</p>\n        <p style=\"margin: 5px 0 0 0; color: #555;\">Cantidad: ${cantChino}</p>\n      </div>\n    </div>`;\n}\n\n// 6. Diseño final del Mail\nlet htmlFinal = `\n<html>\n<body style=\"font-family: Arial, sans-serif; color: #333; background-color: #f4f4f4; padding: 20px;\">\n  <div style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 30px; border-radius: 15px; border: 1px solid #e0e0e0;\">\n    <div style=\"text-align: center; margin-bottom: 20px;\">\n      <h1 style=\"color: #d1a98c; margin: 0;\">Las Dellas</h1>\n      <p style=\"color: #888; font-style: italic;\">Delantales con amor</p>\n    </div>\n    \n    <h2 style=\"font-size: 20px;\">¡Hola ${pedido['Nombre y Apellido'] || 'Cliente'}!</h2>\n    <p>Recibimos tu pedido correctamente. Resumen:</p>\n    \n    <div style=\"margin: 20px 0;\">\n      ${htmlProductos}\n    </div>\n\n    <div style=\"background-color: #f9f9f9; padding: 15px; border-radius: 10px; text-align: right;\">\n      <span style=\"font-size: 18px; font-weight: bold;\">Total: $${totalCalculado}</span>\n    </div>\n\n    <p style=\"margin-top: 25px;\">WhatsApp: <strong>${pedido['Whatsapp'] || 'No indicado'}</strong></p>\n    <p>Dirección: <strong>${pedido['Dirección (Retiro por local)'] || 'A convenir'}</strong></p>\n    \n    <div style=\"text-align: center; margin-top: 40px; font-size: 11px; color: #aaa; border-top: 1px solid #eee; padding-top: 20px;\">\n      © 2026 Las Dellas - Buenos Aires, Argentina\n    </div>\n  </div>\n</body>\n</html>\n`;\n\n// 7. Retornamos los datos limpios para el nodo de Gmail\nreturn {\n  htmlConfirmacion: htmlFinal,\n  EmailCliente: pedido[\"Email\"],\n  NombreCliente: pedido[\"Nombre y Apellido\"],\n  Total: totalCalculado\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "df193633-ce0e-4857-8bab-7d70b4f03700",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fromEmail": "marquitosgriffa@gmail.com",
+        "toEmail": "={{ $json.EmailCliente }}",
+        "subject": "Recibimos tu compra!",
+        "html": "={{ $json.htmlConfirmacion }}",
+        "options": {
+          "bccEmail": "marquitosgriffa@gmail.com"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "8eb159ed-4e6d-4c41-9549-d83f57a835dd",
+      "name": "Send an Email",
+      "webhookId": "53dee579-601c-46f4-bdd2-fc96e463c481",
+      "credentials": {
+        "smtp": {
+          "id": "2CsjTvTJoofg11Pc",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "794fea14-0fff-4ed0-b2f8-2ee7c106266c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "1jQ-KgyR2Wl2WxHZunOVgMlw7mG2JN8Tdv6muAYMPpKE",
+          "mode": "list",
+          "cachedResultName": "Las_Dellas (respuestas)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jQ-KgyR2Wl2WxHZunOVgMlw7mG2JN8Tdv6muAYMPpKE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 412105294,
+          "mode": "list",
+          "cachedResultName": "Respuestas de formulario 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jQ-KgyR2Wl2WxHZunOVgMlw7mG2JN8Tdv6muAYMPpKE/edit#gid=412105294"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Procesando"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "1deab283-f9df-45af-b937-78682dcf5a87",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "ykbuzcCoWICyl490",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jQ-KgyR2Wl2WxHZunOVgMlw7mG2JN8Tdv6muAYMPpKE",
+          "mode": "list",
+          "cachedResultName": "Las_Dellas (respuestas)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jQ-KgyR2Wl2WxHZunOVgMlw7mG2JN8Tdv6muAYMPpKE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 412105294,
+          "mode": "list",
+          "cachedResultName": "Respuestas de formulario 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jQ-KgyR2Wl2WxHZunOVgMlw7mG2JN8Tdv6muAYMPpKE/edit#gid=412105294"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Procesando": "Si",
+            "row_number": "={{ $('Get row(s) in sheet').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Marca temporal",
+              "displayName": "Marca temporal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Modelos [Origen - Reversible 35.000 c/u]",
+              "displayName": "Modelos [Origen - Reversible 35.000 c/u]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Modelos [Origen - Chino 30.000 c/u]",
+              "displayName": "Modelos [Origen - Chino 30.000 c/u]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Modelos [Origen - Toalla 40.000 c/u]",
+              "displayName": "Modelos [Origen - Toalla 40.000 c/u]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nombre y Apellido",
+              "displayName": "Nombre y Apellido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Whatsapp",
+              "displayName": "Whatsapp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Dirección (Retiro por local)",
+              "displayName": "Dirección (Retiro por local)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total",
+              "displayName": "Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Procesando",
+              "displayName": "Procesando",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        0
+      ],
+      "id": "c208b161-957b-4ff6-996b-26d87df21fec",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "ykbuzcCoWICyl490",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Email": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "13636ffb-5757-450a-8efc-17e0b4b79954",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1b376c37198907285c1a75d9a4ee84a83b44af7ecf27cae25e9589eb73696969"
+  },
+  "id": "HiHAN3M7s2hFA3xU",
+  "tags": []
+}
